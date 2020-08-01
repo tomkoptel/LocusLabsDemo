@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.locuslabs.sdk.maps.model.*
 import com.locuslabs.sdk.maps.model.Map
 import com.locuslabs.sdk.maps.view.MapView
+import com.olderwold.locuslabsdemo.util.overridableViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.map_fullscreen.*
 
@@ -19,7 +21,8 @@ internal class MapFragment : Fragment(R.layout.map_fullscreen) {
         const val PERMISSIONS_REQUEST_CODE = 200
     }
 
-    private val viewModel: VenueViewModel by viewModels()
+    private val viewModel: VenueViewModel by overridableViewModels()
+    private val viewModel2: VenueViewModel2 by overridableViewModels()
     private var mapView: MapView? = null
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -39,11 +42,11 @@ internal class MapFragment : Fragment(R.layout.map_fullscreen) {
             )
         } else {
             viewModel.load()
+            viewModel.state.observe(viewLifecycleOwner, Observer { database ->
+                load(database, "lax")
+            })
         }
-
-        viewModel.state.observe(viewLifecycleOwner, Observer { database ->
-            load(database, "lax")
-        })
+        viewModel2.load()
     }
 
     override fun onRequestPermissionsResult(
@@ -56,6 +59,9 @@ internal class MapFragment : Fragment(R.layout.map_fullscreen) {
             // Assume all permissions were granted (in practice you would need to check each permission)
             if (grantResults.isNotEmpty()) {
                 viewModel.load()
+                viewModel.state.observe(viewLifecycleOwner, Observer { database ->
+                    load(database, "lax")
+                })
             }
         }
     }
