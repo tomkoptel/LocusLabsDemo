@@ -3,6 +3,7 @@ package com.olderwold.locuslabsdemo
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,6 +15,7 @@ import com.locuslabs.sdk.maps.view.MapView
 import com.olderwold.locuslabsdemo.util.overridableViewModels
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.map_fullscreen.*
+import kotlinx.android.synthetic.main.map_fullscreen.view.*
 
 @AndroidEntryPoint
 internal class MapFragment : Fragment(R.layout.map_fullscreen) {
@@ -42,11 +44,11 @@ internal class MapFragment : Fragment(R.layout.map_fullscreen) {
             )
         } else {
             viewModel.load()
+            viewModel2.load()
             viewModel.state.observe(viewLifecycleOwner, Observer { database ->
                 load(database, "lax")
             })
         }
-        viewModel2.load()
     }
 
     override fun onRequestPermissionsResult(
@@ -68,6 +70,7 @@ internal class MapFragment : Fragment(R.layout.map_fullscreen) {
 
     private fun load(venueDatabase: VenueDatabase, venueId: String) {
         val listeners = VenueDatabase.OnLoadVenueAndMapListeners()
+        val mapContainer = requireView().mapContainer
         listeners.loadedInitialViewListener = VenueDatabase.OnLoadedInitialViewListener { view ->
             val parent = view.parent as? ViewGroup
             parent?.removeView(view)
@@ -85,8 +88,8 @@ internal class MapFragment : Fragment(R.layout.map_fullscreen) {
                 venue: Venue,
                 _map: Map,
                 _mapView: MapView,
-                p3: Floor,
-                p4: Marker
+                p3: Floor?,
+                p4: Marker?
             ) {
                 mapView = _mapView
                 _mapView.setPositioningEnabled(true)
@@ -97,6 +100,7 @@ internal class MapFragment : Fragment(R.layout.map_fullscreen) {
         }
 
         listeners.loadFailedListener = VenueDatabase.OnLoadFailedListener {
+            Log.e("MapFragment", "Failed to load maps $it")
             // Handle errors here
         }
 

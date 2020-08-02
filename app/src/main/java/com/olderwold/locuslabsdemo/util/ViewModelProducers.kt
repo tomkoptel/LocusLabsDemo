@@ -23,6 +23,6 @@ data class ViewModelProducers constructor(
 
     @Suppress("UNCHECKED_CAST")
     fun <T : ViewModel> get(modelClass: Class<T>): T? {
-        return viewModels[modelClass] as T
+        return viewModels[modelClass] as T?
     }
 }
